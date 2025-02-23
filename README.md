@@ -1,5 +1,7 @@
 # BOSS直聘职位信息爬虫与PDF生成器
 
+[简体中文](README.md) | [English](docs/README_en.md) | [日本語](docs/README_ja.md) | [Français](docs/README_fr.md) | [Deutsch](docs/README_de.md)
+
 这是一个Python程序，可以自动爬取BOSS直聘网站的职位信息，并生成格式化的PDF报告。
 
 ## 功能特点
