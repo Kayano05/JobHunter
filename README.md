@@ -65,7 +65,7 @@ sudo yum install wqy-microhei-fonts
 
 1. 运行爬虫程序：
 ```bash
-python crjob.py
+python main.py
 ```
 
 2. 根据提示输入搜索条件：
