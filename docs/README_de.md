@@ -2,23 +2,24 @@
 
 [简体中文](../README.md) | [English](README_en.md) | [日本語](README_ja.md) | [Français](README_fr.md) | [Deutsch](README_de.md)
 
-Ein Python-Programm, das automatisch Stelleninformationen von der BOSS Direct-Website crawlt und formatierte PDF-Berichte generiert.
+Dies ist ein Python-Programm, das automatisch Stelleninformationen von der BOSS Direct Website crawlt und formatierte PDF-Berichte generiert.
 
 ## Funktionen
 
 - Automatisches Crawlen von BOSS Direct Stelleninformationen
 - Unterstützung für benutzerdefinierte Suchkriterien (Position, Stadt, Seiten)
 - Speicherung der Rohdaten im JSON-Format
-- Generierung schöner PDF-Format-Berichte
-- Unterstützung für chinesische Zeichendarstellung
-- Automatische Seitenumbrüche
+- Generierung schöner PDF-Berichte
+- Unterstützung für chinesische Anzeige
+- Automatische Seitennummerierung
 - Enthält Stellenbezeichnung, Unternehmen, Gehalt, Standort und weitere Informationen
 
 ## Systemanforderungen
 
 - Python 3.7+
-- Chrome-Browser (für Web-Crawling)
+- Chrome Browser (für Web-Crawling)
 - macOS/Linux/Windows
+- Netzwerkumgebung mit Zugriff auf Google-Dienste (VPN erforderlich in Festland-China, da das Programm von ChromeDriver-Download abhängig ist)
 
 ## Installationsschritte
 
@@ -36,16 +37,16 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-3. Installieren Sie die Abhängigkeiten:
+3. Abhängigkeiten installieren:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Chinesische Schriftarten-Einstellungen (falls PDF unleserliche Zeichen anzeigt):
+4. Chinesische Schriftarten-Einstellungen (falls chinesische Zeichen im PDF nicht korrekt angezeigt werden):
 
 Für macOS-Benutzer:
 - Das System enthält normalerweise die erforderlichen chinesischen Schriftarten
-- Bei Problemen laden Sie Source Han Sans herunter und installieren Sie es:
+- Bei fehlerhafter Darstellung Source Han Sans herunterladen und installieren:
 ```bash
 curl -O https://github.com/adobe-fonts/source-han-sans/raw/release/OTF/SimplifiedChinese/SourceHanSansSC-Regular.otf
 ```
@@ -65,16 +66,16 @@ sudo yum install wqy-microhei-fonts
 
 ## Verwendung
 
-1. Führen Sie das Crawler-Programm aus:
+1. Crawler-Programm ausführen:
 ```bash
 python main.py
 ```
 
-2. Geben Sie die Suchkriterien wie aufgefordert ein:
+2. Suchkriterien gemäß den Aufforderungen eingeben:
 ```
-Bitte geben Sie den zu suchenden Stellentitel ein: Python Entwickler
+Bitte geben Sie die zu suchende Stellenbezeichnung ein: Python Entwickler
 Bitte geben Sie den Stadtcode ein (z.B. Peking 101010100, Standard ist Peking): [Enter für Standardwert]
-Bitte geben Sie die maximale Anzahl der zu crawlenden Seiten ein (Standard ist 5): [Enter für Standardwert]
+Bitte geben Sie die maximale Seitenzahl zum Crawlen ein (Standard ist 5): [Enter für Standardwert]
 ```
 
 3. Häufige Stadtcodes:
@@ -90,12 +91,12 @@ Bitte geben Sie die maximale Anzahl der zu crawlenden Seiten ein (Standard ist 5
 Das Programm generiert zwei Dateien:
 
 1. JSON-Datei: enthält Rohdaten
-   - Dateinamenformat: `Stellentitel_Stadtcode_jobs_Zeitstempel.json`
-   - Beispiel: `PythonEntwickler_101010100_jobs_20240223_172956.json`
+   - Dateinamenformat: `stellenbezeichnung_stadtcode_jobs_zeitstempel.json`
+   - Beispiel: `Python Entwickler_101010100_jobs_20240223_172956.json`
 
 2. PDF-Bericht: formatierter Stelleninformationsbericht
-   - Dateinamenformat: `Stellentitel_Stadtcode_jobs_Zeitstempel.pdf`
-   - Beispiel: `PythonEntwickler_101010100_jobs_20240223_172956.pdf`
+   - Dateinamenformat: `stellenbezeichnung_stadtcode_jobs_zeitstempel.pdf`
+   - Beispiel: `Python Entwickler_101010100_jobs_20240223_172956.pdf`
 
 ## PDF-Berichtsinhalt
 
@@ -103,31 +104,37 @@ Der generierte PDF-Bericht enthält:
 - Titelseite: zeigt "Stelleninformationsbericht"
 - Statistiken: zeigt die Gesamtzahl der gefundenen Stellen
 - Stellendetails:
-  - Stellentitel (blau hervorgehoben)
+  - Stellenbezeichnung (blau hervorgehoben)
   - Firmenname
   - Gehaltsbereich
   - Arbeitsort
 
-## Hinweise
+## Wichtige Hinweise
 
-1. Hinweise zur Crawler-Nutzung:
-   - Es wird empfohlen, Intervalle zwischen den Crawls einzuhalten
-   - Vermeiden Sie häufiges Massen-Crawling
-   - Es wird empfohlen, das Standard-5-Seiten-Limit zu verwenden
+1. Hinweise zur Netzwerkumgebung:
+   - Das Programm muss beim Start ChromeDriver herunterladen, was Zugriff auf Google-Server erfordert
+   - Wenn Sie es in Festland-China verwenden, stellen Sie sicher, dass Sie auf Google-Dienste zugreifen können (z.B. durch Verwendung eines VPN)
+   - Das Programm wird ohne Zugriff auf Google-Dienste nicht ordnungsgemäß starten und ausgeführt werden können
 
-2. Hinweise zur PDF-Generierung:
-   - Stellen Sie sicher, dass chinesische Schriftarten installiert sind
+2. Hinweise zur Crawler-Nutzung:
+   - Es wird empfohlen, Intervalle zwischen den Crawl-Vorgängen einzuhalten
+   - Vermeiden Sie häufiges massenhaftes Crawlen
+   - Es wird empfohlen, das Standard-Limit von 5 Seiten zu verwenden
+
+3. Hinweise zur PDF-Generierung:
+   - Stellen Sie sicher, dass chinesische Schriftarten im System installiert sind
    - PDF-Dateien werden automatisch paginiert
    - Unterstützt Chinesisch und Sonderzeichen
 
-3. Mögliche Probleme:
+4. Mögliche Probleme:
    - Wenn ein CAPTCHA erscheint, versuchen Sie es später erneut
-   - Wenn das PDF unleserliche Zeichen anzeigt, folgen Sie den obigen Schriftarten-Installationsanweisungen
+   - Wenn chinesische Zeichen im PDF nicht korrekt angezeigt werden, folgen Sie den obigen Anweisungen zur Schriftarteninstallation
    - Bei Netzwerkverbindungsproblemen überprüfen Sie die Netzwerkeinstellungen
+   - Wenn der ChromeDriver-Download fehlschlägt, überprüfen Sie, ob Sie auf Google-Dienste zugreifen können
 
-## Entwicklungspläne
+## Entwicklungsplan
 
-- [ ] Unterstützung für weitere Suchkriterien hinzufügen
+- [ ] Weitere Suchkriterien-Unterstützung hinzufügen
 - [ ] PDF-Berichtsstil optimieren
 - [ ] Datenanalysefunktionen hinzufügen
 - [ ] Export in weitere Formate unterstützen
