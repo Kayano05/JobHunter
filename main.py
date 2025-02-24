@@ -7,49 +7,49 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 from json_to_pdf import convert_jobs_to_pdf
 
+
 def setup_driver():
-    """设置Selenium驱动，启用无头模式并配置用户代理"""
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")  # 无头模式，后台运行
+    options.add_argument("--headless=new")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     )
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
-    return driver
+
+    try:
+
+        driver_path = ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install()
+        service = Service(executable_path=driver_path)
+
+        print(f"使用 ChromeDriver 路径: {driver_path}")
+        driver = webdriver.Chrome(service=service, options=options)
+        return driver
+    except Exception as e:
+        print(f"ChromeDriver 启动失败: {str(e)}")
+        print(f"请确保已安装最新版本的 Chrome 浏览器")
+        raise
+
 
 def crawl_job_info(driver, job_title, city_code="101010100", max_pages=5):
-    """
-    爬取指定职位和城市的职位信息，支持翻页
-    参数:
-        driver: Selenium WebDriver实例
-        job_title: 要查询的职位名称
-        city_code: 城市代码，默认为北京(101010100)
-        max_pages: 最大爬取页数，默认为5
-    返回:
-        职位信息列表
-    """
     base_url = f"https://www.zhipin.com/web/geek/job?query={job_title}&city={city_code}"
     driver.get(base_url)
-    time.sleep(random.uniform(3, 5))  # 初始加载等待
-
+    time.sleep(random.uniform(3, 5))
     job_list = []
     page = 1
 
     while page <= max_pages:
         print(f"正在爬取第 {page} 页...")
         try:
-            # 等待职位列表加载
+
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".job-card-wrapper"))
             )
 
-            # 查找所有职位卡片
             job_cards = driver.find_elements(By.CSS_SELECTOR, ".job-card-wrapper")
             for card in job_cards:
                 try:
@@ -68,14 +68,13 @@ def crawl_job_info(driver, job_title, city_code="101010100", max_pages=5):
 
             print(f"第 {page} 页爬取完成，当前共爬取到 {len(job_list)} 个职位")
 
-            # 尝试翻页
             try:
                 next_button = driver.find_element(By.CSS_SELECTOR, ".ui-icon-arrow-right")
                 if "disabled" in next_button.find_element(By.XPATH, "..").get_attribute("class"):
                     print("已到达最后一页")
                     break
                 next_button.click()
-                time.sleep(random.uniform(3, 5))  # 等待新页面加载
+                time.sleep(random.uniform(3, 5))
                 page += 1
             except Exception as e:
                 print(f"翻页时出错: {str(e)}")
@@ -87,8 +86,8 @@ def crawl_job_info(driver, job_title, city_code="101010100", max_pages=5):
 
     return job_list
 
+
 def save_to_json(data, filename):
-    """将数据保存为JSON文件"""
     try:
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
@@ -98,8 +97,8 @@ def save_to_json(data, filename):
         print(f"保存文件时出错: {str(e)}")
         return None
 
+
 def main():
-    """主函数，运行爬取程序并生成PDF报告"""
     driver = setup_driver()
     try:
         job_title = input("请输入要查询的职位名称: ")
@@ -110,13 +109,13 @@ def main():
         result = crawl_job_info(driver, job_title, city_code, max_pages)
 
         if result:
-            # 保存JSON文件
+
             timestamp = time.strftime('%Y%m%d_%H%M%S')
             json_filename = f"{job_title}_{city_code}_jobs_{timestamp}.json"
             pdf_filename = f"{job_title}_{city_code}_jobs_{timestamp}.pdf"
-            
+
             if save_to_json(result, json_filename):
-                # 生成PDF报告
+
                 convert_jobs_to_pdf(json_filename, pdf_filename)
                 print(f"\n处理完成:")
                 print(f"1. JSON文件：{json_filename}")
@@ -133,6 +132,7 @@ def main():
             print("未获取到数据，请检查网络连接或查询条件")
     finally:
         driver.quit()
+
 
 if __name__ == "__main__":
     main()
